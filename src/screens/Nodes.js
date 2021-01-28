@@ -4,6 +4,7 @@ import { View, StyleSheet } from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as actions from "../actions/nodes";
+import * as blockActions from "../actions/blocks";
 import Node from "../components/Node";
 import { Heading } from "material-bread";
 
@@ -21,6 +22,10 @@ export class Nodes extends React.Component {
   }
 
   toggleNodeExpanded(node) {
+    if (node.url !== this.state.expandedNodeURL) {
+      this.props.blockActions.loadBlocksForNode(node);
+    }
+
     this.setState({
       expandedNodeURL: node.url === this.state.expandedNodeURL ? null : node.url
     });
@@ -28,6 +33,7 @@ export class Nodes extends React.Component {
 
   render() {
     const { nodes } = this.props;
+
     return (
       <View>
         <Heading style={styles.heading} type={4}>
@@ -50,6 +56,7 @@ Nodes.propTypes = {
   actions: PropTypes.object.isRequired,
   nodes: PropTypes.object.isRequired
 };
+
 const styles = StyleSheet.create({
   heading: { marginLeft: 30, marginTop: 45, fontWeight: "700" }
 });
@@ -62,7 +69,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(actions, dispatch)
+    actions: bindActionCreators(actions, dispatch),
+    blockActions: bindActionCreators(blockActions, dispatch)
   };
 }
 

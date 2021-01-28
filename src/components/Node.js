@@ -1,10 +1,16 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator
+} from "react-native";
 import colors from "../constants/colors";
 import { Paper, Subtitle, BodyText, Caption } from "material-bread";
 import { Expander } from "./Expander";
 import Status from "./Status";
+import BlocksList from "./BlocksList";
 
 const Node = ({ node, expanded, toggleNodeExpanded }) => (
   <TouchableOpacity onPress={() => toggleNodeExpanded(node)}>
@@ -23,11 +29,36 @@ const Node = ({ node, expanded, toggleNodeExpanded }) => (
         style={styles.secondaryHeading}
       />
       <Expander expanded={expanded} style={styles.icon(expanded)} />
-      {expanded && (
-        <View style={styles.heading}>
-          <BodyText type={1} text={"Blocks go here"} />
-        </View>
-      )}
+      {expanded ? (
+        node.blocks && node.blocks.loading ? (
+          <View
+            style={{
+              alignItems: "center",
+              padding: 10,
+              paddingBottom: 0
+            }}
+          >
+            <ActivityIndicator />
+          </View>
+        ) : node.blocks.error !== false ? (
+          <BodyText
+            type={2}
+            style={{ marginTop: 10 }}
+            color={colors.danger}
+            text={
+              node.blocks.error ? node.blocks.error : "Something went wrong!"
+            }
+          />
+        ) : (
+          <View style={styles.heading}>
+            {node.blocks && (node.error !== false && node.blocks.data) ? (
+              <BlocksList blocks={node.blocks.data} />
+            ) : (
+              <BodyText type={2} text={"Something went wrong!"} />
+            )}
+          </View>
+        )
+      ) : null}
     </Paper>
   </TouchableOpacity>
 );
